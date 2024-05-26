@@ -20,6 +20,11 @@ namespace MVVM.Bindings
         {
             _instantiatedViews = instantiatedViews;
         }
+        
+        public ListBinding(IEnumerable<TView> instantiatedViews, IEnumerable<TViewModel> value) : base(value)
+        {
+            _instantiatedViews = instantiatedViews;
+        }
 
         public ListBinding(Transform container, TView prefab, IObservableValue<IEnumerable<TViewModel>> observableValue) : base(
             observableValue)
