@@ -12,18 +12,20 @@ namespace MVVM.Bindings
         where TViewModel : BaseViewModel
         where TView : BaseView<TViewModel>
     {
-        private readonly IEnumerable<TView> _instantiatedViews;
         private readonly Transform _container;
         private readonly TView _prefab;
+        
+        private HashSet<TView> _instantiatedViews;
+        private readonly List<TView> _viewsToDestroy = new(); 
 
         public ListBinding(IEnumerable<TView> instantiatedViews, IObservableValue<IEnumerable<TViewModel>> observableValue) : base(observableValue)
         {
-            _instantiatedViews = instantiatedViews;
+            _instantiatedViews = new HashSet<TView>(instantiatedViews);
         }
         
         public ListBinding(IEnumerable<TView> instantiatedViews, IEnumerable<TViewModel> value) : base(value)
         {
-            _instantiatedViews = instantiatedViews;
+            _instantiatedViews = new HashSet<TView>(instantiatedViews);
         }
 
         public ListBinding(Transform container, TView prefab, IObservableValue<IEnumerable<TViewModel>> observableValue) : base(
@@ -47,6 +49,8 @@ namespace MVVM.Bindings
 
         private void InstantiateViews(IEnumerable<TViewModel> value)
         {
+            _instantiatedViews = new HashSet<TView>();
+            
             var max = value.Count();
             var viewModelsEnumerator = value.GetEnumerator();
 
@@ -55,7 +59,7 @@ namespace MVVM.Bindings
                 viewModelsEnumerator.MoveNext();
 
                 var viewModel = viewModelsEnumerator.Current;
-                var view = Object.Instantiate<TView>(_prefab, _container);
+                var view = Instantiate();
                 
                 view.Setup(viewModel);
 
@@ -65,9 +69,16 @@ namespace MVVM.Bindings
             viewModelsEnumerator.Dispose();
         }
 
+        private TView Instantiate()
+        {
+            var view = Object.Instantiate(_prefab, _container);
+            _instantiatedViews.Add(view);
+            return view;
+        }
+
         private void ManageInstantiatedViews(IEnumerable<TViewModel> value)
         {
-            var max = _instantiatedViews.Count();
+            var max = Mathf.Max(_instantiatedViews.Count, value.Count());
 
             var viewsEnumerator = _instantiatedViews.GetEnumerator();
             var viewModelsEnumerator = value.GetEnumerator();
@@ -80,6 +91,16 @@ namespace MVVM.Bindings
                 var view = viewsEnumerator.Current;
                 var viewModel = viewModelsEnumerator.Current;
 
+                if (view == null)
+                {
+                    view = Instantiate();
+                }
+
+                if (viewModel == null)
+                {
+                    _viewsToDestroy.Add(view);
+                }
+                
                 view.Setup(viewModel);
 
                 max--;
@@ -87,6 +108,19 @@ namespace MVVM.Bindings
             
             viewsEnumerator.Dispose();
             viewModelsEnumerator.Dispose();
+
+            DestroyUnusedViews();
+        }
+
+        private void DestroyUnusedViews()
+        {
+            foreach (var view in _viewsToDestroy)
+            {
+                _instantiatedViews.Remove(view);
+                Object.Destroy(view);
+            }
+            
+            _viewsToDestroy.Clear();
         }
     }
 }
