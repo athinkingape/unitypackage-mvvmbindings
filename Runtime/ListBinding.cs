@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MVVM.Bindings.Base;
@@ -5,6 +6,7 @@ using MVVM.Models;
 using MVVM.ViewModels;
 using MVVM.Views;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MVVM.Bindings
 {
@@ -31,12 +33,27 @@ namespace MVVM.Bindings
             _prefab = prefab;
         }
         
+        public ListBinding(IObservableValue<IEnumerable<TViewModel>> observableValue, IEnumerable<TView> instantiatedViews) : base(observableValue)
+        {
+            _instantiatedViews = new HashSet<TView>(instantiatedViews);
+        }
+        
+        public ListBinding(IEnumerable<TViewModel> observableValue, IEnumerable<TView> instantiatedViews) : base(observableValue)
+        {
+            _instantiatedViews = new HashSet<TView>(instantiatedViews);
+        }
+        
         protected override void OnUpdate(IEnumerable<TViewModel> value)
         {
             ManageInstantiatedViews(value);
         }
 
-        private TView Instantiate() => Object.Instantiate(_prefab, _container);
+        private TView Instantiate()
+        {
+            if (_prefab == null) throw new ArgumentNullException("Prefab is not specified, but tried to instantiate");
+            if (_container == null) throw new ArgumentNullException("Containter for new element is null");
+            return Object.Instantiate(_prefab, _container);
+        } 
 
         private void ManageInstantiatedViews(IEnumerable<TViewModel> value)
         {
