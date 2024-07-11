@@ -17,26 +17,20 @@ namespace MVVM.Bindings
         
         private HashSet<TView> _instantiatedViews; 
 
-        public ListBinding(IEnumerable<TView> instantiatedViews, IObservableValue<IEnumerable<TViewModel>> observableValue) : base(observableValue)
+        public ListBinding(TView prefab, Transform container, IObservableValue<IEnumerable<TViewModel>> observableValue, IEnumerable<TView> instantiatedViews = null) : base(observableValue)
         {
-            _instantiatedViews = new HashSet<TView>(instantiatedViews);
-            _container = instantiatedViews.First().transform;
-        }
-        
-        public ListBinding(IEnumerable<TView> instantiatedViews, IEnumerable<TViewModel> value) : base(value)
-        {
-            _instantiatedViews = new HashSet<TView>(instantiatedViews);
-            _container = instantiatedViews.First().transform;
-        }
-
-        public ListBinding(Transform container, TView prefab, IObservableValue<IEnumerable<TViewModel>> observableValue) : base(
-            observableValue)
-        {
-            _instantiatedViews = new HashSet<TView>();
+            _instantiatedViews = instantiatedViews == null ? new HashSet<TView>() : new HashSet<TView>(instantiatedViews);
             _container = container;
             _prefab = prefab;
         }
-
+        
+        public ListBinding(TView prefab, Transform container, IEnumerable<TViewModel> observableValue, IEnumerable<TView> instantiatedViews = null) : base(observableValue)
+        {
+            _instantiatedViews = instantiatedViews == null ? new HashSet<TView>() : new HashSet<TView>(instantiatedViews);
+            _container = container;
+            _prefab = prefab;
+        }
+        
         protected override void OnUpdate(IEnumerable<TViewModel> value)
         {
             ManageInstantiatedViews(value);
