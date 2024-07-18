@@ -10,6 +10,7 @@ namespace MVVM.Bindings
         private readonly Button _button;
         private readonly ICommand _command;
         private readonly Action _action;
+        private bool _subscribed;
         
         public ButtonBinding(Button button, ICommand command)
         {
@@ -25,17 +26,26 @@ namespace MVVM.Bindings
 
         public void OnEnable()
         {
+            if (_subscribed) return;
+            
             _button.onClick.AddListener(_command == null ? _action.Invoke : _command.Execute);
+            _subscribed = true;
         }
 
         public void OnDisable()
         {
+            if (!_subscribed) return;
+            
             _button.onClick.RemoveListener(_command == null ? _action.Invoke : _command.Execute);
+            _subscribed = false;
         }
 
         public void OnDestroy()
         {
+            if (!_subscribed) return;
+            
             _button.onClick.RemoveListener(_command == null ? _action.Invoke : _command.Execute);
+            _subscribed = false;
         }
     }
 }
