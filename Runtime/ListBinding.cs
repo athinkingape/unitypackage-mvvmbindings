@@ -79,6 +79,7 @@ namespace MVVM.Bindings
                 }
                 else
                 {
+                    view.gameObject.SetActive(true);
                     view.Setup(viewModel);
                 }
 
