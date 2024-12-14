@@ -1,6 +1,6 @@
 {
     "name": "MVVMBindings",
-    "rootNamespace": "",
+    "rootNamespace": "MVVM.Bindings",
     "references": [
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:d968b064f94154e64a3c4d913e43a695"
