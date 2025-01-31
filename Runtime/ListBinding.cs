@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 namespace MVVM.Bindings
 {
     public class ListBinding<TView, TViewModel> : BaseValueBinding<IEnumerable<TViewModel>> 
-        where TViewModel : BaseViewModel
+        where TViewModel : BaseViewModel<TViewModel>
         where TView : BaseView<TViewModel>
     {
         private readonly Transform _container;
