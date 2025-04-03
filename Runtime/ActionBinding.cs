@@ -12,6 +12,12 @@ namespace MVVM.Bindings
         {
             _action = action;
         }
+        
+        public ActionBinding(T value, Action<T> action) : base(value)
+        {
+            _action = action;
+            OnUpdate(value);
+        }
 
         protected override void OnUpdate(T value)
         {
