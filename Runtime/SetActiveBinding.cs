@@ -21,8 +21,8 @@ namespace MVVM.Bindings
             _isInverted = isInverted;
         }
 
-        protected override void OnUpdate(bool value)
-        {
+        protected override void OnUpdate(bool value) {
+            if (_target == null) return;
             _target.SetActive(_isInverted ? !value : value);
         }
     }
