@@ -60,7 +60,9 @@ namespace MVVM.Bindings
         }
         
         private void OnCommandChanged(ICommand command) {
+            OnDisable();
             _command = command;
+            OnEnable();
         }
     }
 }
